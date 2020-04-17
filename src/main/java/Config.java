@@ -1,0 +1,31 @@
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+
+import java.io.*;
+
+public class Config {
+    public static ConfigItem config;
+
+    public Config() {
+        try {
+            config = readSavedConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ConfigItem readSavedConfig() {
+        Gson gson = new Gson();
+        ConfigItem config = null;
+
+        try {
+            JsonReader reader = new JsonReader(new FileReader("config.json"));
+            System.out.println(reader.toString());
+            config = gson.fromJson(reader, ConfigItem.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return config;
+    }
+}
