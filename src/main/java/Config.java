@@ -20,7 +20,6 @@ public class Config {
 
         try {
             JsonReader reader = new JsonReader(new FileReader("config.json"));
-            System.out.println(reader.toString());
             config = gson.fromJson(reader, ConfigItem.class);
         } catch (IOException e) {
             e.printStackTrace();

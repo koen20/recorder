@@ -1,8 +1,10 @@
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,7 +19,7 @@ public class Mysql {
             Timer updateTimer = new Timer();
             updateTimer.scheduleAtFixedRate(new checkMysqlConnection(), 2000, 10000);
             Timer updateTimer2 = new Timer();
-            updateTimer2.scheduleAtFixedRate(new process(), 300000, 300000);
+            updateTimer2.scheduleAtFixedRate(new process(), 3000, 300000);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -51,22 +53,61 @@ public class Mysql {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             stmt.close();
-        } catch (SQLException e) {
+        } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
-            sqlQueue.add(sql);
+            addToQueue(sql);
         }
     }
 
+    static void addToQueue(String sql) {
+        sqlQueue = readFromFile();
+        sqlQueue.add(sql);
+        saveToFile(sqlQueue);
+    }
+
     private void proccessQueue() {
-        for (String sql : sqlQueue) {
+        sqlQueue = readFromFile();
+        Iterator<String> d = sqlQueue.iterator();
+        while (d.hasNext()) {
+            String sql = d.next();
             try {
                 Statement stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
                 stmt.close();
-                sqlQueue.remove(sql);
+                d.remove();
+                saveToFile(sqlQueue);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    static void saveToFile(ArrayList<String> list) {
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("queue"));
+            outputStream.writeObject(list);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static ArrayList<String> readFromFile() {
+        ArrayList<String> res = new ArrayList<String>();
+        try {
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("queue"));
+            res = (ArrayList<String>) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    static String getMysqlDateString(long milliseconds) {
+        java.util.Date dt = new java.util.Date(milliseconds);
+
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return sdf.format(dt);
     }
 }

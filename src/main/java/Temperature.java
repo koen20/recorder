@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Temperature {
     static double tempInside;
@@ -18,6 +21,19 @@ public class Temperature {
         getTempOutside();
         System.out.println(tempInside);
         System.out.println(tempOutside);
+        Timer updateTimer = new Timer();
+        updateTimer.scheduleAtFixedRate(new updateDb(), 5000, 900000);
+    }
+
+    private class updateDb extends TimerTask {
+        @Override
+        public void run() {
+            getTempInside();
+            getTempOutside();
+            Calendar cal = Calendar.getInstance();
+            Mysql.insertData(Mysql.conn, "INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
+            Mysql.insertData(Mysql.conn, "INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
+        }
     }
 
     private String getTemp(String sensor) {
@@ -57,7 +73,7 @@ public class Temperature {
         return tempInside;
     }
 
-    private void getTempOutside() {
+    private double getTempOutside() {
         try {
             JSONObject jsonObject = new JSONObject(getTemp("sensor.outside_temperature"));
             tempOutside = jsonObject.getDouble("state");
@@ -94,5 +110,6 @@ public class Temperature {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return tempOutside;
     }
 }

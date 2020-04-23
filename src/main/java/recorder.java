@@ -9,7 +9,5 @@ public class recorder {
         new Mysql();
         new Temperature();
         System.out.println(config.config.getMysqlServer());
-        System.out.println("asdf");
-        Spark.port(9999);
     }
 }
