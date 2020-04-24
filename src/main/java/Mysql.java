@@ -48,7 +48,7 @@ public class Mysql {
         }
     }
 
-    public static void insertData(Connection conn, String sql) {
+    public static void insertData(String sql) {
         try {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);

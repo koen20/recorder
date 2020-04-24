@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class ConfigItem {
     private String mysqlUsername;
     private String mysqlPassword;
@@ -7,8 +9,11 @@ public class ConfigItem {
     private String mqttHost;
     private String homeAssistantToken;
     private String homeAssistantServer;
+    private String tempSensorInside;
+    private String tempSensorOutside;
+    private ArrayList<String> overwatchPlayers;
 
-    public ConfigItem(String mysqlUsername, String mysqlPassword, String mysqlServer, String mqttUsername, String mqttPassword, String mqttHost, String homeAssistantToken, String homeAssistantServer) {
+    public ConfigItem(String mysqlUsername, String mysqlPassword, String mysqlServer, String mqttUsername, String mqttPassword, String mqttHost, String homeAssistantToken, String homeAssistantServer, String tempSensorInside, String tempSensorOutside, ArrayList<String> overwatchPlayers) {
         this.mysqlUsername = mysqlUsername;
         this.mysqlPassword = mysqlPassword;
         this.mysqlServer = mysqlServer;
@@ -17,6 +22,9 @@ public class ConfigItem {
         this.mqttHost = mqttHost;
         this.homeAssistantToken = homeAssistantToken;
         this.homeAssistantServer = homeAssistantServer;
+        this.tempSensorInside = tempSensorInside;
+        this.tempSensorOutside = tempSensorOutside;
+        this.overwatchPlayers = overwatchPlayers;
     }
 
     public String getMysqlUsername() {
@@ -49,5 +57,17 @@ public class ConfigItem {
 
     public String getHomeAssistantServer() {
         return homeAssistantServer;
+    }
+
+    public ArrayList<String> getOverwatchPlayers() {
+        return overwatchPlayers;
+    }
+
+    public String getTempSensorInside() {
+        return tempSensorInside;
+    }
+
+    public String getTempSensorOutside() {
+        return tempSensorOutside;
     }
 }

@@ -31,8 +31,8 @@ public class Temperature {
             getTempInside();
             getTempOutside();
             Calendar cal = Calendar.getInstance();
-            Mysql.insertData(Mysql.conn, "INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
-            Mysql.insertData(Mysql.conn, "INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
+            Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
+            Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
         }
     }
 
@@ -65,7 +65,7 @@ public class Temperature {
 
     private double getTempInside() {
         try {
-            JSONObject jsonObject = new JSONObject(getTemp("sensor.bme280_sensor_temperature"));
+            JSONObject jsonObject = new JSONObject(getTemp(Config.config.getTempSensorInside()));
             tempInside = jsonObject.getDouble("state");
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +75,7 @@ public class Temperature {
 
     private double getTempOutside() {
         try {
-            JSONObject jsonObject = new JSONObject(getTemp("sensor.outside_temperature"));
+            JSONObject jsonObject = new JSONObject(getTemp(Config.config.getTempSensorOutside()));
             tempOutside = jsonObject.getDouble("state");
         } catch (Exception e) {
             e.printStackTrace();

@@ -11,6 +11,7 @@ public class Config {
             config = readSavedConfig();
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error reading config");
         }
     }
 
