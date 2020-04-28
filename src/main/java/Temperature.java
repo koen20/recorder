@@ -31,8 +31,12 @@ public class Temperature {
             getTempInside();
             getTempOutside();
             Calendar cal = Calendar.getInstance();
-            Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
-            Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
+            if (tempInside != -999) {
+                Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
+            }
+            if (tempOutside != -999) {
+                Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
+            }
         }
     }
 
@@ -69,6 +73,7 @@ public class Temperature {
             tempInside = jsonObject.getDouble("state");
         } catch (Exception e) {
             e.printStackTrace();
+            tempInside = -999;
         }
         return tempInside;
     }
@@ -79,6 +84,7 @@ public class Temperature {
             tempOutside = jsonObject.getDouble("state");
         } catch (Exception e) {
             e.printStackTrace();
+            tempOutside = -999;
         }
 
         try {

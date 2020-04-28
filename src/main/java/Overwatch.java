@@ -12,7 +12,14 @@ import java.util.TimerTask;
 public class Overwatch {
     public Overwatch() {
         Timer updateTimer = new Timer();
-        updateTimer.scheduleAtFixedRate(new update(), millisToNextDay(Calendar.getInstance()), 86400000);//1 day
+        updateTimer.scheduleAtFixedRate(new update(), recorder.millisToNextDay(Calendar.getInstance()), 86400000);//1 day
+        for (String player : Config.config.getOverwatchPlayers()) {
+            try {
+                insertDb(updateStats(player));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public class update extends TimerTask {
@@ -120,17 +127,5 @@ public class Overwatch {
                     + "', '" + item.getCompGamesPlayed() + "', '" + item.getQuickTimePlayed() + "', '" + item.getCompTimePlayed() +
                     "', '" + item.getQuickGamesWon() + "', '" + item.getCompGamesWon() + "', '" + item.getPlayer() + "')");
         }
-    }
-
-    public static long millisToNextDay(Calendar calendar) {
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        int seconds = calendar.get(Calendar.SECOND);
-        int millis = calendar.get(Calendar.MILLISECOND);
-        int hoursToNextDay = 23 - hours;
-        int minutesToNextHour = 60 - minutes;
-        int secondsToNextHour = 60 - seconds;
-        int millisToNextHour = 1000 - millis;
-        return hoursToNextDay * 60 * 60 * 1000 + minutesToNextHour * 60 * 1000 + secondsToNextHour * 1000 + millisToNextHour;
     }
 }
