@@ -2,6 +2,7 @@ FROM openjdk:11 as builder
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
+RUN chmod +x gradlew
 RUN ./gradlew clean build
 RUN tar -xvf build/distributions/recorder-1.0.tar
 
