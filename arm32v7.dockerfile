@@ -8,7 +8,7 @@ FROM debian@sha256:030ab272b197c7e534d4807c14842d751280fc8eec87aa00ae102abf19888
 
 COPY --from=builder qemu-arm-static /usr/bin
 
-RUN mkdir -p /usr/share/man/man1 && apt-get update && apt-get install -y openjdk-11-jdk tar
+RUN mkdir -p /usr/share/man/man1 && apt-get update && apt-get install -y openjdk-15-jdk tar
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN chmod +x gradlew
