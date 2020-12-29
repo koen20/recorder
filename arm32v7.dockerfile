@@ -17,11 +17,8 @@ RUN tar -xvf ./recorder-1.0.tar && rm recorder-1.0.tar
 ENV APPLICATION_USER ktor
 RUN useradd -ms /bin/bash $APPLICATION_USER
 
-
-
-USER $APPLICATION_USER
-
 WORKDIR /config
 RUN chown -R $APPLICATION_USER /usr/src/app
 RUN chown -R $APPLICATION_USER /config
+USER $APPLICATION_USER
 CMD /usr/src/app/recorder-1.0/bin/recorder
