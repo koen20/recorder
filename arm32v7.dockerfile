@@ -21,6 +21,7 @@ RUN chown -R $APPLICATION_USER /usr/src/app
 
 USER $APPLICATION_USER
 
-WORKDIR /usr/src/app/recorder-1.0
+RUN mkdir /config
+WORKDIR /config
 
-CMD bin/recorder
+CMD /usr/src/app/recorder-1.0/bin/recorder
