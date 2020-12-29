@@ -8,8 +8,9 @@ FROM bellsoft/liberica-openjdk-debian@sha256:ba760c31d6a730334aae61a82da94841d63
 
 COPY --from=builder qemu-arm-static /usr/bin
 
-COPY ./build/distributions/recorder-1.0.tar /usr/src/app
 RUN mkdir /usr/src/app
+COPY ./build/distributions/recorder-1.0.tar /usr/src/app
+
 WORKDIR /usr/src/app
 RUN tar -xvf ./recorder-1.0.tar && rm recorder-1.0.tar
 
