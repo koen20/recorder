@@ -4,15 +4,16 @@ FROM alpine AS builder
 ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz
 RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
 
-FROM adoptopenjdk/openjdk8:armv7l-ubuntu-jdk8u-nightly
+FROM debian@sha256:030ab272b197c7e534d4807c14842d751280fc8eec87aa00ae102abf19888e85
 
 COPY --from=builder qemu-arm-static /usr/bin
 
+RUN mkdir -p /usr/share/man/man1 && apt-get update && apt-get install -y openjdk-11-jdk tar
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN chmod +x gradlew
 RUN ./gradlew clean build
-RUN tar -xvf build/distributions/recorder-1.0.tar
+RUN tar -xvf build/distributions/recorder-1.0.tar && rm -R build
 
 ENV APPLICATION_USER ktor
 RUN useradd -ms /bin/bash $APPLICATION_USER
