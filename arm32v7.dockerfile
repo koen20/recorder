@@ -1,24 +1,32 @@
 FROM alpine AS builder
 
 # Download QEMU, see https://github.com/docker/hub-feedback/issues/1261
-ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v5.2.0%2Bbalena4/qemu-5.2.0.balena4-arm.tar.gz
 RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
 
-FROM bellsoft/liberica-openjdk-debian@sha256:ba760c31d6a730334aae61a82da94841d6327c3301a83af50c1370169634a4d2
+#debian:stable-slim
+FROM debian@sha256:1ec158078b7216bd88034ec46c5fb55ac164143ae517e1a72de9deabbd5f40be AS builderApp
 
 COPY --from=builder qemu-arm-static /usr/bin
 
-RUN mkdir /usr/src/app
-COPY ./build/distributions/recorder-1.0.tar /usr/src/app
-
+RUN mkdir -p /usr/share/man/man1 && apt-get update && apt-get install -y openjdk-15-jdk tar
+COPY . /usr/src/app
 WORKDIR /usr/src/app
-RUN tar -xvf ./recorder-1.0.tar && rm recorder-1.0.tar
+RUN chmod +x gradlew
+RUN ./gradlew clean build
+RUN tar -xvf build/distributions/recorder-1.0.tar && rm -R build
 
+FROM arm32v7/adoptopenjdk@sha256:5e402bdceb6ff79a07c131137d646d2924ff9d116a40902172e89cf7c41d192c
+COPY --from=builder qemu-arm-static /usr/bin
 ENV APPLICATION_USER ktor
 RUN useradd -ms /bin/bash $APPLICATION_USER
 
-WORKDIR /config
-RUN chown -R $APPLICATION_USER /usr/src/app
-RUN chown -R $APPLICATION_USER /config
+RUN mkdir /app
+RUN chown -R $APPLICATION_USER /app
+
 USER $APPLICATION_USER
-CMD /usr/src/app/recorder-1.0/bin/recorder
+
+COPY --from=builderApp /usr/src/app/recorder-1.0/* /app/
+WORKDIR /app
+
+CMD bin/recorder
