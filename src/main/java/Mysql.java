@@ -1,12 +1,7 @@
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 public class Mysql {
     public static Connection conn;
@@ -17,7 +12,7 @@ public class Mysql {
             conn = DriverManager.getConnection(Config.config.getMysqlServer(),
                     Config.config.getMysqlUsername(), Config.config.getMysqlPassword());
             Timer updateTimer = new Timer();
-            updateTimer.scheduleAtFixedRate(new checkMysqlConnection(), 2000, 10000);
+            updateTimer.scheduleAtFixedRate(new checkMysqlConnection(), 2000, 50000);
             Timer updateTimer2 = new Timer();
             updateTimer2.scheduleAtFixedRate(new process(), 3000, 300000);
         } catch (SQLException e) {
@@ -49,6 +44,7 @@ public class Mysql {
     }
 
     public static void insertData(String sql) {
+        System.out.println(sql);
         try {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -56,6 +52,38 @@ public class Mysql {
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
             addToQueue(sql);
+        }
+    }
+
+    public static void insertOverwatchData(OverwatchPlayerItem item) {
+        Calendar cal = Calendar.getInstance();
+        try {
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO overwatch VALUES (?, NULL, ?, ?, ?, '" + item.getCompWinrate()
+                    + "', '" + item.getCompGamesPlayed() + "', '" + item.getQuickTimePlayed() + "', '" + item.getCompTimePlayed() +
+                    "', '" + item.getQuickGamesWon() + "', '" + item.getCompGamesWon() + "', ?)");
+
+            stmt.setTimestamp(1, new Timestamp(cal.getTimeInMillis()));
+
+            if (item.getTankComprank() == 0) {
+                stmt.setNull(2, Types.INTEGER);
+            } else {
+                stmt.setInt(2, item.getTankComprank());
+            }
+            if (item.getDamageComprank() == 0) {
+                stmt.setNull(3, Types.INTEGER);
+            } else {
+                stmt.setInt(3, item.getDamageComprank());
+            }
+            if (item.getSupportComprank() == 0) {
+                stmt.setNull(4, Types.INTEGER);
+            } else {
+                stmt.setInt(4, item.getSupportComprank());
+            }
+            stmt.setString(5, item.getPlayer());
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException | NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
