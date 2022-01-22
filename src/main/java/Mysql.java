@@ -58,8 +58,8 @@ public class Mysql {
     public static void insertOverwatchData(OverwatchPlayerItem item) {
         Calendar cal = Calendar.getInstance();
         try {
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO overwatch VALUES (?, NULL, ?, ?, ?, '" + item.getCompWinrate()
-                    + "', '" + item.getCompGamesPlayed() + "', '" + item.getQuickTimePlayed() + "', '" + item.getCompTimePlayed() +
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO overwatch VALUES (?, NULL, ?, ?, ?, ?"
+                    + ", '" + item.getCompGamesPlayed() + "', '" + item.getQuickTimePlayed() + "', '" + item.getCompTimePlayed() +
                     "', '" + item.getQuickGamesWon() + "', '" + item.getCompGamesWon() + "', ?)");
 
             stmt.setTimestamp(1, new Timestamp(cal.getTimeInMillis()));
@@ -79,7 +79,12 @@ public class Mysql {
             } else {
                 stmt.setInt(4, item.getSupportComprank());
             }
-            stmt.setString(5, item.getPlayer());
+            if (item.getCompWinrate() == null) {
+                stmt.setNull(5, Types.INTEGER);
+            } else {
+                stmt.setInt(5, item.getCompWinrate());
+            }
+            stmt.setString(6, item.getPlayer());
             stmt.execute();
             stmt.close();
         } catch (SQLException | NullPointerException e) {
