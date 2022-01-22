@@ -15,9 +15,8 @@ repositories {
 dependencies {
     implementation 'org.json:json:20210307'
     implementation 'com.google.code.gson:gson:2.8.7'
-    //implementation "com.sparkjava:spark-core:2.9.1"
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 

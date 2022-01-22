@@ -79,10 +79,10 @@ public class Mysql {
             } else {
                 stmt.setInt(4, item.getSupportComprank());
             }
-            if (item.getCompWinrate() == null) {
+            if (Double.isNaN(item.getCompWinrate())) {
                 stmt.setNull(5, Types.INTEGER);
             } else {
-                stmt.setInt(5, item.getCompWinrate());
+                stmt.setDouble(5, item.getCompWinrate());
             }
             stmt.setString(6, item.getPlayer());
             stmt.execute();
