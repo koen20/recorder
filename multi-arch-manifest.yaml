@@ -4,6 +4,10 @@ manifests:
     platform:
       architecture: amd64
       os: linux
+  - image: ghcr.io/koen20/recorder:arm64
+    platform:
+      architecture: arm64
+      os: linux
   - image: ghcr.io/koen20/recorder:arm32v7
     platform:
       architecture: arm
