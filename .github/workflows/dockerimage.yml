@@ -24,7 +24,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./arm32v7.dockerfile
+          file: ./amd64.dockerfile
           platforms: linux/amd64
           push: true
           tags: ghcr.io/koen20/recorder:amd64
@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./arm32v7.dockerfile
+          file: ./amd64.dockerfile
           platforms: linux/arm64
           push: true
           tags: ghcr.io/koen20/recorder:arm64
