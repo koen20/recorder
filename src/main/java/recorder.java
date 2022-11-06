@@ -7,7 +7,7 @@ public class recorder {
         new Temperature();
         if (Config.config.getOverwatchPlayers() != null) {
             if (Config.config.getOverwatchPlayers().size() != 0) {
-                new Overwatch();
+                //new Overwatch();
             }
         }
         if (Config.config.getWotPlayers() != null && Config.config.getWotApiKey() != null) {
