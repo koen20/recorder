@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -48,65 +49,68 @@ public class Overwatch {
         int comprankTank = 0;
         int comprankDps = 0;
         int comprankSupport = 0;
-        int compGamesTied = 0;
+        int compGamesLost = 0;
 
-        String response = getData(player);
+        String response = getData(player, false);
 
         JSONObject jsonObject = new JSONObject(response);
-        JSONObject compOverallstats = jsonObject.getJSONObject("competitive");
-        JSONObject compGameStats = jsonObject.getJSONObject("games").getJSONObject("competitive");
-        JSONObject quickGameStats = jsonObject.getJSONObject("games").getJSONObject("quickplay");
-        JSONObject playtime = jsonObject.getJSONObject("playtime");
+        JSONArray compStatsAllHeroes = jsonObject.getJSONObject("stats").getJSONObject("pc").getJSONObject("competitive").getJSONObject("career_stats").getJSONArray("all-heroes");
+        JSONArray allHeroesStats = null;
+
+        for (int i = 0; i < compStatsAllHeroes.length(); i++) {
+            if (compStatsAllHeroes.getJSONObject(i).getString("category").equals("game")) {
+                allHeroesStats = compStatsAllHeroes.getJSONObject(i).getJSONArray("stats");
+            }
+        }
 
         try {
-            if (!compOverallstats.getJSONObject("tank").isNull("rank")) {
-                comprankTank = compOverallstats.getJSONObject("tank").getInt("rank");
-            }
-            if (!compOverallstats.getJSONObject("support").isNull("rank")) {
-                comprankSupport = compOverallstats.getJSONObject("support").getInt("rank");
-            }
-            if (!compOverallstats.getJSONObject("damage").isNull("rank")) {
-                comprankDps = compOverallstats.getJSONObject("damage").getInt("rank");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            win_rate = compGameStats.getDouble("win_rate");
+            JSONObject summaryComp = jsonObject.getJSONObject("summary").getJSONObject("competitive").getJSONObject("pc");
+            comprankTank = getCompRank(summaryComp.getJSONObject("tank"));
+            comprankDps = getCompRank(summaryComp.getJSONObject("dps"));
+            comprankSupport = getCompRank(summaryComp.getJSONObject("support"));
         } catch (Exception ignored) {
         }
         try {
-            compGamesPlayed = compGameStats.getInt("played");
-            if (!compGameStats.isNull("won")) {
-                compGamesWon = compGameStats.getInt("won");
-            }
-            compGamesTied = compGameStats.getInt("draw");
-
-            quickGamesWon = quickGameStats.getInt("won");
-
-            quickTimePlayed = parseTimeToHours(playtime.getString("quickplay"));
-            compTimePlayed = parseTimeToHours(playtime.getString("competitive"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (compGamesWon == 0) {
-                compGamesWon = compGamesPlayed - compGamesTied - compGameStats.getInt("lost");
+            if (allHeroesStats != null) {
+                compGamesPlayed = getStatFromList(allHeroesStats, "games_played");
+                compGamesWon = getStatFromList(allHeroesStats, "games_won");
+                compGamesLost = getStatFromList(allHeroesStats, "games_lost");
+                compTimePlayed = getStatFromList(allHeroesStats, "time_played") / 60.0 / 60.0;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (win_rate == 0) {
-            win_rate = (compGamesWon / (compGamesPlayed - compGamesTied * 0.0)) * 100;
-        }
+        win_rate = (compGamesWon / (compGamesPlayed - (compGamesPlayed - compGamesWon - compGamesLost) * 0.0)) * 100;
         item = new OverwatchPlayerItem(player, comprankSupport, comprankTank, comprankDps, win_rate, compGamesPlayed, quickTimePlayed, compTimePlayed, quickGamesWon, compGamesWon);
 
         return item;
     }
 
-    private String getData(String player) throws IOException {
-        String url = "https://owapi.io/profile/pc/eu/" + player;
+    private int getStatFromList(JSONArray jsonArray, String key) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            if (object.getString("key").equals(key)) {
+                return object.getInt("value");
+            }
+        }
+        return 0;
+    }
+
+    private int getCompRank(JSONObject item) {
+        OverwatchDivision division = OverwatchDivision.valueOf(item.getString("division"));
+        int compRank = 0;
+        if (division.ordinal() > 0) {
+            compRank += 1500 + (division.ordinal() - 1) * 500;
+        }
+        compRank += (5 - item.getInt("tier")) * 100;
+        return compRank;
+    }
+
+    private String getData(String player, boolean summary) throws IOException {
+        String url = "https://overfast-api.tekrop.fr/players/" + player;
+        if (summary) {
+            url = url + "/summary";
+        }
 
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
