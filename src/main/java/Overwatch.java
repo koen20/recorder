@@ -65,10 +65,17 @@ public class Overwatch {
 
         try {
             JSONObject summaryComp = jsonObject.getJSONObject("summary").getJSONObject("competitive").getJSONObject("pc");
-            comprankTank = getCompRank(summaryComp.getJSONObject("tank"));
-            comprankDps = getCompRank(summaryComp.getJSONObject("dps"));
-            comprankSupport = getCompRank(summaryComp.getJSONObject("support"));
-        } catch (Exception ignored) {
+            if (summaryComp.has("tank") && !summaryComp.isNull("tank")) {
+                comprankTank = getCompRank(summaryComp.getJSONObject("tank"));
+            }
+            if (summaryComp.has("dps") && !summaryComp.isNull("dps")) {
+                comprankDps = getCompRank(summaryComp.getJSONObject("dps"));
+            }
+            if (summaryComp.has("support") && !summaryComp.isNull("support")) {
+                comprankSupport = getCompRank(summaryComp.getJSONObject("support"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
             if (allHeroesStats != null) {
@@ -97,6 +104,7 @@ public class Overwatch {
     }
 
     private int getCompRank(JSONObject item) {
+        System.out.println(item.toString());
         OverwatchDivision division = OverwatchDivision.valueOf(item.getString("division"));
         int compRank = 0;
         if (division.ordinal() > 0) {
