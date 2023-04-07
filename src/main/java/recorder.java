@@ -15,6 +15,7 @@ public class recorder {
                 new Wot();
             }
         }
+        new Odoo();
     }
 
     public static long millisToNextDay(Calendar calendar) {

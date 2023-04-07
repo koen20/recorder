@@ -1,7 +1,6 @@
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 public class Mysql {
     public static Connection conn;
@@ -58,7 +57,7 @@ public class Mysql {
     public static void insertOverwatchData(OverwatchPlayerItem item) {
         Calendar cal = Calendar.getInstance();
         try {
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO overwatch VALUES (?, NULL, ?, ?, ?, ?"
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO sensors.overwatch VALUES (?, NULL, ?, ?, ?, ?"
                     + ", '" + item.getCompGamesPlayed() + "', '" + item.getQuickTimePlayed() + "', '" + item.getCompTimePlayed() +
                     "', '" + item.getQuickGamesWon() + "', '" + item.getCompGamesWon() + "', ?)");
 
@@ -90,6 +89,47 @@ public class Mysql {
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean insertOdooItem(OdooOrderItem item) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO bloemenwinkel.bonRegels VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            stmt.setInt(1, item.getOdooId());
+            stmt.setDate(2, java.sql.Date.valueOf(item.getDate()));
+            stmt.setNull(3, Types.INTEGER);
+            stmt.setDouble(4, (double) Math.round(item.getPriceExcl() * 100) / 100);
+            stmt.setDouble(5, (double) Math.round(item.getPriceIncl() * 100) / 100);
+            stmt.setNull(6, Types.VARCHAR);
+            stmt.setNull(7, Types.VARCHAR);
+            stmt.setNull(8, Types.VARCHAR);
+            stmt.setTime(9, Time.valueOf(item.getTime()));
+
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException | NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static String odooGetLatestItem() {
+        String dateTime = null;
+        try {
+            Statement stmt = conn.createStatement();
+            {
+                String strSelect = "SELECT CONCAT(datum,' ',tijd) AS date_time FROM bloemenwinkel.bonRegels WHERE tijd IN(SELECT MAX(tijd) FROM bloemenwinkel.bonRegels WHERE datum IN(SELECT MAX(datum) FROM bloemenwinkel.bonRegels))";
+
+                ResultSet rset = stmt.executeQuery(strSelect);
+                while (rset.next()) {
+                    dateTime = rset.getString(1);
+                }
+            }
+        } catch (SQLException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return dateTime;
     }
 
     static void addToQueue(String sql) {

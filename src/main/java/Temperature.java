@@ -32,10 +32,10 @@ public class Temperature {
             getTempOutside();
             Calendar cal = Calendar.getInstance();
             if (tempInside != -999) {
-                Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
+                Mysql.insertData("INSERT INTO sensors.temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempInside + "', 'inside')");
             }
             if (tempOutside != -999) {
-                Mysql.insertData("INSERT INTO temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
+                Mysql.insertData("INSERT INTO sensors.temperature VALUES (DEFAULT, '" + Mysql.getMysqlDateString(cal.getTimeInMillis()) + "', '" + tempOutside + "', 'outside')");
             }
         }
     }
