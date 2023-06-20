@@ -1,4 +1,4 @@
-FROM openjdk:11 as builder
+FROM eclipse-temurin:11-jdk as builder
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
@@ -6,10 +6,10 @@ RUN chmod +x gradlew
 RUN ./gradlew clean build
 RUN tar -xvf build/distributions/recorder-1.0.tar
 
-FROM openjdk:11-jre
+FROM eclipse-temurin:11-jre-alpine
 
 ENV APPLICATION_USER ktor
-RUN useradd -ms /bin/bash $APPLICATION_USER
+RUN adduser -D $APPLICATION_USER
 
 RUN mkdir /app
 RUN chown -R $APPLICATION_USER /app
